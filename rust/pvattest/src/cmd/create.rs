@@ -7,7 +7,7 @@ use crate::{
     exchange::{ExchangeFormatRequest, ExchangeFormatVersion},
 };
 use anyhow::{bail, Context, Result};
-use log::{debug, warn};
+use log::{info, debug, warn};
 use pv::{
     attest::{AttestationFlags, AttestationMeasAlg, AttestationRequest, AttestationVersion},
     misc::{create_file, write_file},
@@ -23,6 +23,8 @@ fn flags(cli_flags: &[AttAddFlags]) -> AttestationFlags {
             AttAddFlags::PhkhAtt => att_flags.set_attest_phkh(),
         }
     }
+
+    log::info!("PhkhImg is {:?}", att_flags.set_image_phkh());
     att_flags
 }
 

@@ -2,8 +2,9 @@
 //
 // Copyright IBM Corp. 2024
 use anyhow::{anyhow, bail, Error, Result};
+use log::{debug, warn, info};
 use byteorder::ByteOrder;
-use pv::{assert_size, request::MagicValue, uv::AttestationCmd, uv::ConfigUid};
+use pv::{assert_size, misc::open_file, request::{MagicValue, BootHdrTags}, uv::AttestationCmd, uv::ConfigUid};
 use std::{
     io::{ErrorKind, Read, Seek, SeekFrom, Write},
     mem::size_of,
@@ -555,6 +556,7 @@ anyhow!(
             bail!("{INV_EXCHANGE_FMT_ERROR_TEXT} Contains no attestation response (CUID missing).")
 ,
         };
+        log::info!("config_uid is {:?}", config_uid);
         Self::new(arcb, measurement, additional, user, config_uid)
     }
 

@@ -3,7 +3,7 @@
 // Copyright IBM Corp. 2024
 
 use anyhow::Result;
-use log::{debug, warn};
+use log::{debug, warn, info};
 use pv::{
     attest::{
         AdditionalData, AttestationFlags, AttestationItems, AttestationMeasurement,
@@ -73,11 +73,14 @@ impl<'a> Display for VerifyOutput<'a> {
 pub fn verify(opt: &VerifyOpt) -> Result<ExitCode> {
     let mut input = open_file(&opt.input)?;
     let mut img = open_file(&opt.hdr)?;
+    let tags = BootHdrTags::from_se_image(&mut img)?;
+    log::info!("BootHdrTags is {:?}", tags);
     let output = opt.output.as_ref().map(create_file).transpose()?;
     let arpk = SymKey::Aes256(
         read_exact_file(&opt.arpk, "Attestation request protection key").map(Confidential::new)?,
     );
     let tags = BootHdrTags::from_se_image(&mut img)?;
+    log::info!("BootHdrTags is {:?}", tags);
     let exchange = ExchangeFormatResponse::read(&mut input)?;
 
     let (auth, conf) = AttestationRequest::decrypt_bin(exchange.arcb(), &arpk)?;

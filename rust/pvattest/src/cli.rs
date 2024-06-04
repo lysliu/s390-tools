@@ -3,7 +3,7 @@
 // Copyright IBM Corp. 2024
 
 use clap::{Args, Parser, Subcommand, ValueEnum, ValueHint};
-use log::warn;
+use log::{debug, warn, info};
 use utils::CertificateOptions;
 
 /// create, perform, and verify attestation measurements
@@ -193,6 +193,8 @@ impl<'a> From<&'a PerformAttOpt> for PerformAttOptComb<'a> {
             (None, None) => unreachable!(),
         };
         let user_data = value.user_data.as_deref();
+        log::info!("user_data is {:?}", user_data);
+
         Self {
             input,
             output,
