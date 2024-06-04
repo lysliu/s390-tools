@@ -3,7 +3,7 @@
 // Copyright IBM Corp. 2024
 
 use crate::{
-    cli::{AttAddFlags, CreateAttOpt},
+    cli::{AttAddFlags, CreateAttOpt, VerifyOpt},
     exchange::{ExchangeFormatRequest, ExchangeFormatVersion},
 };
 use anyhow::{bail, Context, Result};
@@ -32,9 +32,12 @@ pub fn create(opt: &CreateAttOpt) -> Result<ExitCode> {
     let att_version = AttestationVersion::One;
     let meas_alg = AttestationMeasAlg::HmacSha512;
 
+    log::info!("att_version is {:?}", att_version);
+    log::info!("meas_alg is {:?}", meas_alg);
     let mut arcb = AttestationRequest::new(att_version, meas_alg, flags(&opt.add_data))?;
     debug!("Generated Attestation request");
 
+    log::info!("arcb is {:?}", arcb);
     // Add host-key documents
     opt.certificate_args
         .get_verified_hkds("attestation request")?
@@ -46,6 +49,8 @@ pub fn create(opt: &CreateAttOpt) -> Result<ExitCode> {
         ReqEncrCtx::random(SymKeyType::Aes256).context("Failed to generate random input")?;
     let ser_arcb = arcb.encrypt(&encr_ctx)?;
     warn!("Successfully generated the request");
+    log::info!("encr_ctx is {:?}", encr_ctx);
+    log::info!("ser_arcb is {:?}", ser_arcb);
 
     let mut output = create_file(&opt.output)?;
     let exch_ctx = ExchangeFormatRequest::new(
@@ -59,6 +64,7 @@ pub fn create(opt: &CreateAttOpt) -> Result<ExitCode> {
         SymKey::Aes256(k) => k,
         _ => bail!("Unexpected key type"),
     };
+    log::info!("arpk is {:?}", arpk);
     write_file(
         &opt.arpk,
         arpk.value(),
