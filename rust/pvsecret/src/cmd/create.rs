@@ -39,7 +39,7 @@ pub fn create(opt: &CreateSecretOpt) -> Result<()> {
 
     let mut asrcb = build_asrcb(opt)?;
     debug!("Generated Add-secret request");
-
+    log::info!("asrcb is {:?}", asrcb);
     // Add host-key documents
     opt.certificate_args
         .get_verified_hkds("secret")?
