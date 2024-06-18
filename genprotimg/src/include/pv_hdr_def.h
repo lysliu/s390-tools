@@ -42,44 +42,44 @@
 #define PV_V1_IPIB_MAX_SIZE	PAGE_SIZE
 #define PV_V1_PV_HDR_MAX_SIZE	(2 * PAGE_SIZE)
 
-typedef struct pv_hdr_key_slot {
+typedef struct pv_hdr_key_slot { // 32 32 16
 	uint8_t digest_key[SHA256_DIGEST_LENGTH];
 	uint8_t wrapped_key[32];
 	uint8_t tag[AES_256_GCM_TAG_SIZE];
 } __packed PvHdrKeySlot;
 
-typedef struct pv_hdr_opt_item {
+typedef struct pv_hdr_opt_item { // 4 32
 	uint32_t otype;
 	uint8_t ibk[32];
 	uint8_t data[];
 } __packed PvHdrOptItem;
 
 /* integrity protected data (by GCM tag), but non-encrypted */
-struct pv_hdr_head {
-	uint64_t magic;
-	uint32_t version;
-	uint32_t phs;
-	uint8_t iv[AES_256_GCM_IV_SIZE];
-	uint32_t res1;
-	uint64_t nks;
-	uint64_t sea;
-	uint64_t nep;
-	uint64_t pcf;
-	union ecdh_pub_key cust_pub_key;
-	uint8_t pld[SHA512_DIGEST_LENGTH];
-	uint8_t ald[SHA512_DIGEST_LENGTH];
-	uint8_t tld[SHA512_DIGEST_LENGTH];
+struct pv_hdr_head {// 8 4 4 12 4 8 8 8 8 160 64 64 64
+	uint64_t magic; //8
+	uint32_t version; //4
+	uint32_t phs; //4
+	uint8_t iv[AES_256_GCM_IV_SIZE]; //12
+	uint32_t res1; //4
+	uint64_t nks; //8
+	uint64_t sea; //8
+	uint64_t nep; //8
+	uint64_t pcf; //8
+	union ecdh_pub_key cust_pub_key; //160
+	uint8_t pld[SHA512_DIGEST_LENGTH]; //64
+	uint8_t ald[SHA512_DIGEST_LENGTH]; //64
+	uint8_t tld[SHA512_DIGEST_LENGTH]; //64
 } __packed;
 
 /* Must not have any padding */
-struct pv_hdr_encrypted {
-	uint8_t cust_comm_key[32];
-	uint8_t img_enc_key_1[AES_256_XTS_KEY_SIZE / 2];
-	uint8_t img_enc_key_2[AES_256_XTS_KEY_SIZE / 2];
-	struct psw_t psw;
-	uint64_t scf;
-	uint32_t noi;
-	uint32_t res2;
+struct pv_hdr_encrypted { // 32 32 32 8 8 4 4
+	uint8_t cust_comm_key[32]; //32
+	uint8_t img_enc_key_1[AES_256_XTS_KEY_SIZE / 2]; //32
+	uint8_t img_enc_key_2[AES_256_XTS_KEY_SIZE / 2]; //32
+	struct psw_t psw; //8
+	uint64_t scf; //8
+	uint32_t noi; //4
+	uint32_t res2; //4
 };
 STATIC_ASSERT(sizeof(struct pv_hdr_encrypted) ==
 	      32 + 32 + 32 + sizeof(struct psw_t) + 8 + 4 + 4)
